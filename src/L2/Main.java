@@ -18,10 +18,10 @@ public class Main {
 		int angles[] = {-360, -180, -90, 90, 180, 360};
 			
 		for(int i = 0; i < angles.length; i++) {
-			result = PIDController1.PID(angles[i], 10, 0, 0, 100);
+			result = PIDController1.PID(angles[i], 5, 1, 0, 300, 500);
 			while(result==null) {}
 			System.out.println(result);
-			Delay.msDelay(2000);
+			Delay.msDelay(100);
 			result = null;
 		}
 //		Button.waitForAnyPress();	// press any button to exit

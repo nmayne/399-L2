@@ -33,7 +33,7 @@ public class PIDController {
 	 * PID controller
 	 * target angle of rotation (deg)
 	 */
-	public String PID(int target, int Kp, int Kd, int Ki, int speedMax) {
+	public String PID(int target, double Kp, double Ki, double Kd, int speedMax, int inputRange) {
 				
 		error = target;	// error
 		prevError = 1;	// error from previous sample
@@ -50,17 +50,14 @@ public class PIDController {
 			timer.reset();
 						
 			error = target-M.getTachoCount();		// get proportional error
-			derivative = (error - prevError) / time; // compute derivative
 			integral = integral + (error*time);		// compute integral
-	
-			// compute and apply power
-			power = Math.abs((Kp * error) + (Kd * derivative) + (Ki * integral));	
-			M.setPower((int) (isPos(error) * Math.min(power, speedMax)));
+			derivative = (error - prevError) / time; // compute derivative
+			prevError = error;						// save the error
 
-			// save the error
-			prevError = error;
-			
-			Delay.msDelay(25);
+			// compute and apply power
+			power = Math.abs((Kp * error) + (Ki * integral) + (Kd * derivative));	
+			M.setPower(map((isPos(error) *Math.min(power, inputRange)),-inputRange, inputRange, -speedMax, speedMax));
+			System.out.println(error);
 		}			
 
 		M.setPower(0); // halt motor
@@ -76,5 +73,13 @@ public class PIDController {
 		} else {
 			return 1;
 		}	
+	}
+	
+	/*
+	 * https://stackoverflow.com/questions/7505991/arduino-map-equivalent-function-in-java
+	 */
+	int map(double x, double in_min, double in_max, double out_min, double out_max)
+	{
+	  return (int) ((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
 	}
 }
