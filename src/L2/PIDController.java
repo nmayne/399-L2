@@ -1,14 +1,12 @@
 /*
  * Nicholas Mayne & Laura Petrich, University of Alberta © 2017.
  */
-
 package L2;
 
 import lejos.hardware.motor.UnregulatedMotor;
 import lejos.utility.Stopwatch;
 
 public class PIDController {
-	
 	UnregulatedMotor M;		// the motor
 	Stopwatch timer;			// the timer
 	String data;				// the pv and time data
@@ -23,18 +21,11 @@ public class PIDController {
 	int prevPower;			// power from previous sample
 	int sampleRate = 10;		// enforced minimum sample rate, 
 	
-	/*
-	 * 
-	 */
 	public PIDController(UnregulatedMotor motor) {
 		M = motor;
 		timer = new Stopwatch();
 	}
 	
-	/*
-	 * PID controller
-	 * target angle of rotation (deg)
-	 */
 	public String PID(int sp, double Kp, double Ki, double Kd, int powerMax, int timeout) {
 		data = "";						// process variable and time data
 		error = sp;						// error
@@ -55,8 +46,9 @@ public class PIDController {
 			power = (int) Math.abs((Kp * error) + (Ki * integral) + (Kd * derivative));
 			M.setPower(isPos(error) * (Math.min(powerMax, power)));
 			
-			while(timer.elapsed()<sampleRate){}
+			while(timer.elapsed()<sampleRate){}			// enforce minimum sample rate
 			
+			// get delta t and error
 			delta_t = timer.elapsed();
 			elapsed_t = elapsed_t + delta_t;
 			timer.reset();
@@ -64,7 +56,7 @@ public class PIDController {
 			pv = M.getTachoCount();
 			error = sp - pv;
 			
-			data = data + elapsed_t + ", " + pv + "; ";
+			data = data + elapsed_t + ", " + pv + "; ";	// update data log
 			
 			if(elapsed_t > timeout){break;}
 		}
