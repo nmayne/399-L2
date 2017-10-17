@@ -18,28 +18,47 @@ public class Main {
 		UnregulatedMotor M1 = new UnregulatedMotor(MotorPort.A);
 		PIDController PIDController1 = new PIDController(M1);
 		
-		
-//		//Uncomment this section to run iterative testing w/ Matlab output
+//		// (Un)comment this section to run iterative testing w/ Matlab output
 //		
 //		String filename = "";
 //		String expData = "";
 //		String legend = "";
 //		
 //		int timeout;
-//		int prec = 10;		// nicer printout of PID K values in Matlab
+//		int prec = 10;			// nicer printout of PID K values in Matlab
+//		int testTime = 1750;		// how long is one parameter test?
 //		
 //		// start values		// end values		// increment
-//		double p_ = 4.0;		double p__ = 15.0;	double p___ = 1.0;		// Kp
-//		double i_ = 0.0;		double i__ = 0.005;	double i___ = 0.001;		// Ki
-//		double d_ = 0.0;		double d__ = 3.0;	double d___ = 0.5;		// Kd
 //		
-//		int setPoints[] = {50, 150, 400};	// test these angles (Deg)
-//		int powers[] = {10, 50, 100};		// test these motor powers, [10, 100]
+//		// P Controller
+//		double p_ = 1.0;		double p__ = 16.0;	double p___ = 1.0;		// Kp > 14 is unstable
+//		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
+//		double d_ = 0.0;		double d__ = 0.0;	double d___ = 0.5;		// Kd > 4 is unstable
+//		
+//		// PD Controller
+////		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
+////		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
+////		double d_ = 0.0;		double d__ = 4.0;	double d___ = 0.5;		// Kd > 4 is unstable
+//		
+//		// PID Controller
+////		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
+////		double i_ = 0.0;		double i__ = 0.6;	double i___ = 0.1;		// Ki > 0.6 is unstable
+////		double d_ = 0.0;		double d__ = 4.0;	double d___ = 0.5;		// Kd > 4 is unstable
+//		
+//		
+//		
+//		int setPoints[] = {50, 200, 400};	// test these angles (Deg)
+//		int powers[] = {25, 50, 100};		// test these motor powers, [25, 100]
+//		
+//		// approximately how long is this test series going to take?
+//		double PIDLoopCount = (((p__-p_)/p___)+1) * (((i__-i_)/i___)+1) * (((d__-d_)/d___)+1);
+//		int EstTime = (int) ((PIDLoopCount * setPoints.length * powers.length * testTime));
+//		System.out.printf("ETA: %.2f min\n\n", (double)((EstTime / 1000) / 60));
 //		
 //		// run and log tests
 //		for (int power : powers) {
 //			for(int setPoint : setPoints) {
-//				timeout = 200000/power;
+//				timeout = 150000 / power; // wait longer for lower powers
 //				
 //				filename = "P" + power + "SP" + setPoint;
 //				
@@ -58,7 +77,6 @@ public class Main {
 //
 //			    try {
 //			    		out.write(""
-//			    				+ "clear all; clc;\n"
 //							+ "figure(1);\n"
 //							+ "hold on;\n"
 //							+ "xlabel('Time (ms)');\n"
@@ -78,9 +96,10 @@ public class Main {
 //							legend = legend + "'" + label + "', ";
 //							System.out.println(label);
 //							
-//							expData = PIDController1.PID(setPoint, Kp, Ki, Kd, power, timeout);
-//							
-//						    try {
+//							expData = PIDController1.PID(setPoint, Kp, Ki, Kd, power, timeout);							
+//							System.out.println("Time: " + (expData.substring(expData.lastIndexOf(';', expData.length()-3) + 2, expData.lastIndexOf(',')-2)) + " ms\n");							
+//						    EstTime = EstTime - testTime;
+//							try {
 //					    			out.write(""
 //					    					+ label + " = ["
 //					    					+ expData
@@ -109,29 +128,45 @@ public class Main {
 //							+ "ylabel('Theta (Deg)');\n"
 //							+ "title('PID Controller | " + filename + " | Good Options');\n"
 //							+ "plot([0 " + timeout + "], [" + setPoint + " " + setPoint + "], 'r--');\n"
+//							
+//							+ "upper = " + setPoint + ";\n"
+//							+ "idx = 0;\n"
+//							+ "while idx < 6\n"
+//							+ "    for e = t\n"
+//							+ "        if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= " + (setPoint) + "\n"
+//							+ "            idx = idx + 1;\n"
+//							+ "        end\n"
+//							+ "    end\n"
+//							+ "    upper = upper + 1;\n"
+//							+ "end\n"
+//							+ "upper = upper - 1;\n"
 //							+ "legendTwo = {'" + setPoint + " Deg'};\n"
-//							+ "idx = 1;\n"
+//							+ "idx = 0;\n"
 //							+ "for e = t\n"
-//							+ "    if max(e{1}(:,2)) <= "+ (setPoint + 5)
-//							+ " && max(e{1}(:,2)) >= " + (setPoint) + "\n"
+//							+ "    idx = idx + 1;\n"
+//							+ "    if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= " + (setPoint) + "\n"
 //							+ "        plot(e{1}(:,1),e{1}(:,2));\n"
 //							+ "        legendTwo{end+1} = caseList{idx};\n"
 //							+ "    end\n"
-//							+ "    idx = idx + 1;\n"
 //							+ "end\n"
-//							+ "legend(legendTwo)\n");
+//							+ "newLegend = legend();\n"
+//							+ "newLegend = newLegend.String;\n"
+//							+ "idx = size(legendTwo);\n"
+//							+ "newLegend(end-idx(2)+1:end) = legendTwo(1:end);\n"
+//							+ "legend(newLegend);");
 //					out.close(); // flush the buffer and write the file
 //				}
 //				catch (IOException e) {
 //					System.err.println("Failed to close file");
 //				}
 //				System.out.println("Closed: " + filename);
+//				System.out.printf("ETA: %.2f min\n\n", (double)((EstTime / 1000) / 60));
 //				legend = "";
 //			}
 //		}
 		
 		
-//		// Uncomment this section to run interpolated functions for K gains
+//		// (Un)comment this section to run interpolated functions for K gains
 //		int timeout = 200000;
 //		int setPoints[] = {50, 150, -400, 33, 854, 237, -90, 1000};
 //		int powers[] = {10, 25, 75, 100};
@@ -150,10 +185,51 @@ public class Main {
 //				
 //				PIDController1.PID(setPoint, Kp, Ki, Kd, power, timeout);	
 //				
-////				System.out.printf("P: %.5f\nI: %.5f\nD: %.5f\n",Kp, Ki, Kd);
-////				Delay.msDelay(2000);
+//				System.out.printf("P: %.5f\nI: %.5f\nD: %.5f\n",Kp, Ki, Kd);
+//				Delay.msDelay(2000);
 //			}
 //		}
+		
+		
+		
+/*
+ *		General model Power1 for Kp:
+		f(x) = a*x^b
+		Coefficients (with 95% confidence bounds):
+		a =       18.51  (-8.729, 45.74)
+		b =     -0.5707  (-0.9995, -0.1418)
+		
+		General model Power1 for Kd:
+     	f(x) = a*x^b
+		Coefficients (with 95% confidence bounds):
+       	a =      0.5646  (0.155, 0.9741)
+       	b =      0.2721  (0.08683, 0.4573)
+
+ */
+		
+//		// (Un)comment this section to run interpolated functions for K gains
+//		int timeout = 200000;
+//		int setPoints[] = {50, 150, -400, 33, 854, 237, -90, 1000};
+//		int powers[] = {10, 25, 75, 100};
+//		
+//		// Kp poly					//Ki gauss				// Kd poly
+//		double p_a = 18.51;			double i_a = 0;			double d_a = 0.5646;
+//		double p_b = -0.5707;		double i_b = 0;			double d_b = 0.2721;
+//								
+//		for (int power : powers) {
+//			for(int setPoint : setPoints) {
+//				double Kp = p_a * Math.pow(power, p_b);
+//				double Ki = i_a * Math.pow(power, i_b);
+//				double Kd = d_a * Math.pow(power, d_b);
+//				
+//				PIDController1.PID(setPoint, Kp, Ki, Kd, power, timeout);	
+//				
+//				System.out.printf("P: %.5f\nI: %.5f\nD: %.5f\n",Kp, Ki, Kd);
+//				Delay.msDelay(2000);
+//			}
+//		}
+		
+		
 		
 		
 	M1.close();	
