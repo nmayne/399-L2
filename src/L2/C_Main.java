@@ -18,152 +18,152 @@ public class C_Main {
 		UnregulatedMotor M1 = new UnregulatedMotor(MotorPort.A);
 		C_PIDController PIDController = new C_PIDController(M1);
 		
-		// (Un)comment this section to run iterative testing w/ Matlab output
-		
-		String filename = "";
-		String expData = "";
-		String legend = "";
-		
-		int timeout;
-		int prec = 10;			// nicer printout of PID K values in Matlab
-		int testTime = 1750;		// how long is one parameter test?
-		
-		// start values		// end values		// increment
-		
-		// P Controller
-		double p_ = 1.0;		double p__ = 16.0;	double p___ = 1.0;		// Kp > 14 is unstable
-		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
-		double d_ = 0.0;		double d__ = 0.0;	double d___ = 0.5;		// Kd > 4 is unstable
-		
-		// PD Controller
-//		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
-//		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
-//		double d_ = 0.0;		double d__ = 4.0;	double d___ = 0.5;		// Kd > 4 is unstable
-		
-		// PID Controller
+//		// (Un)comment this section to run iterative testing w/ Matlab output
+//		
+//		String filename = "";
+//		String expData = "";
+//		String legend = "";
+//		
+//		int timeout;
+//		int prec = 10;			// nicer printout of PID K values in Matlab
+//		int testTime = 1750;		// how long is one parameter test?
+//		
+//		// start values		// end values		// increment
+//		
+//		// P Controller
+////		double p_ = 1.0;		double p__ = 16.0;	double p___ = 1.0;		// Kp > 14 is unstable
+////		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
+////		double d_ = 0.0;		double d__ = 0.0;	double d___ = 0.5;		// Kd > 4 is unstable
+//		
+//		// PD Controller
+////		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
+////		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
+////		double d_ = 0.0;		double d__ = 4.0;	double d___ = 0.5;		// Kd > 4 is unstable
+//		
+//		// PID Controller
 //		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
 //		double i_ = 0.0;		double i__ = 0.6;	double i___ = 0.1;		// Ki > 0.6 is unstable
 //		double d_ = 0.0;		double d__ = 4.0;	double d___ = 0.5;		// Kd > 4 is unstable
-		
-		
-		
-		int setPoints[] = {50, 200, 400};	// test these angles (Deg)
-		int powers[] = {25, 50, 100};		// test these motor powers, [25, 100]
-		
-		// approximately how long is this test series going to take?
-		double PIDLoopCount = (((p__-p_)/p___)+1) * (((i__-i_)/i___)+1) * (((d__-d_)/d___)+1);
-		int EstTime = (int) ((PIDLoopCount * setPoints.length * powers.length * testTime));
-		System.out.printf("ETA: %.2f min\n\n", (double)((EstTime / 1000) / 60));
-		
-		// run and log tests
-		for (int power : powers) {
-			for(int setPoint : setPoints) {
-				timeout = 150000 / power; // wait longer for lower powers
-				
-				filename = "P" + power + "SP" + setPoint;
-				
-			    FileWriter out = null; 
-			    File data = new File(filename + ".m");
-			    
-			    try	{
-			    		out = new FileWriter(data);
-			    } 
-			    catch(IOException e) {
-			    		System.err.println("Failed to create output stream");
-			    		Button.waitForAnyPress();
-			    		System.exit(1);
-			    	}
-				System.out.println("Opened: " + filename);
-
-			    try {
-			    		out.write(""
-							+ "figure(1);\n"
-							+ "hold on;\n"
-							+ "xlabel('Time (ms)');\n"
-							+ "ylabel('Theta (Deg)');\n"
-							+ "title('PID Controller | " + filename + "');\n"
-							+ "plot([0 " + timeout + "], [" + setPoint + " " + setPoint + "], 'r--');\n");
-			    }
-			    catch (IOException e) {
-			    		System.err.println("Failed to write file header");
-			    }
-
-				// run the PID test
-				for(double Kp = p_; Kp <= p__; Kp = Kp + p___) {
-					for(double Ki = i_; Ki <= i__; Ki = Ki + i___) {
-						for(double Kd = d_; Kd <= d__; Kd = Kd + d___) {
-							String label = String.format("Kp%di%dd%d", (int) (Kp*prec), (int) (Ki*prec), (int) (Kd*prec));
-							legend = legend + "'" + label + "', ";
-							System.out.println(label);
-							
-							expData = PIDController.PID(setPoint, Kp, Ki, Kd, power, timeout);							
-							System.out.println("Time: " + (expData.substring(expData.lastIndexOf(';', expData.length()-3) + 2, expData.lastIndexOf(',')-2)) + " ms\n");							
-						    EstTime = EstTime - testTime;
-							try {
-					    			out.write(""
-					    					+ label + " = ["
-					    					+ expData
-					    					+ "];\n"
-										+ "plot(" + label + "(:,1)," + label + "(:,2))\n"
-										+ "% y = max(" + label + "(:,2));\n"
-										+ "% x = " + label + "(find(" + label + "(:,2) == max(y), 1, 'first'));\n"
-										+ "% text(x, y, '" + label + "');\n"
-										+ "% pause;\n\n");
-						    }
-						    catch (IOException e) {
-						    		System.err.println("Failed to write exp data");
-						    }
-							Delay.msDelay(100);
-						}
-					}
-				}
-				try {
-					out.write(""
-							+ "caseList = {" + legend.substring(0, legend.length() - 2) + "};\n"
-							+ "legend('" + Integer.toString(setPoint) + " Deg', caseList{1,:});\n\n"
-							+ "t = {" + legend.substring(0, legend.length() - 2).replace("'", "") + "};\n\n"
-							+ "figure(2);\n"
-							+ "hold on;\n"
-							+ "xlabel('Time (ms)');\n"
-							+ "ylabel('Theta (Deg)');\n"
-							+ "title('PID Controller | " + filename + " | Good Options');\n"
-							+ "plot([0 " + timeout + "], [" + setPoint + " " + setPoint + "], 'r--');\n"
-							
-							+ "upper = " + setPoint + ";\n"
-							+ "idx = 0;\n"
-							+ "while idx < 6\n"
-							+ "    for e = t\n"
-							+ "        if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= " + (setPoint) + "\n"
-							+ "            idx = idx + 1;\n"
-							+ "        end\n"
-							+ "    end\n"
-							+ "    upper = upper + 1;\n"
-							+ "end\n"
-							+ "upper = upper - 1;\n"
-							+ "legendTwo = {'" + setPoint + " Deg'};\n"
-							+ "idx = 0;\n"
-							+ "for e = t\n"
-							+ "    idx = idx + 1;\n"
-							+ "    if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= " + (setPoint) + "\n"
-							+ "        plot(e{1}(:,1),e{1}(:,2));\n"
-							+ "        legendTwo{end+1} = caseList{idx};\n"
-							+ "    end\n"
-							+ "end\n"
-							+ "newLegend = legend();\n"
-							+ "newLegend = newLegend.String;\n"
-							+ "idx = size(legendTwo);\n"
-							+ "newLegend(end-idx(2)+1:end) = legendTwo(1:end);\n"
-							+ "legend(newLegend);");
-					out.close(); // flush the buffer and write the file
-				}
-				catch (IOException e) {
-					System.err.println("Failed to close file");
-				}
-				System.out.println("Closed: " + filename);
-				System.out.printf("ETA: %.2f min\n\n", (double)((EstTime / 1000) / 60));
-				legend = "";
-			}
-		}
+//		
+//		
+//		
+//		int setPoints[] = {50, 200, 400};	// test these angles (Deg) {50, 200, 400}
+//		int powers[] = {25, 50, 100};		// test these motor powers {25, 50, 100}
+//		
+//		// approximately how long is this test series going to take?
+//		double PIDLoopCount = (((p__-p_)/p___)+1) * (((i__-i_)/i___)+1) * (((d__-d_)/d___)+1);
+//		int EstTime = (int) ((PIDLoopCount * setPoints.length * powers.length * testTime));
+//		System.out.printf("ETA: %.2f min\n\n", (double)((EstTime / 1000) / 60));
+//		
+//		// run and log tests
+//		for (int power : powers) {
+//			for(int setPoint : setPoints) {
+//				timeout = 150000 / power; // wait longer for lower powers
+//				
+//				filename = "P" + power + "SP" + setPoint;
+//				
+//			    FileWriter out = null; 
+//			    File data = new File(filename + ".m");
+//			    
+//			    try	{
+//			    		out = new FileWriter(data);
+//			    } 
+//			    catch(IOException e) {
+//			    		System.err.println("Failed to create output stream");
+//			    		Button.waitForAnyPress();
+//			    		System.exit(1);
+//			    	}
+//				System.out.println("Opened: " + filename);
+//
+//			    try {
+//			    		out.write(""
+//							+ "figure(1);\n"
+//							+ "hold on;\n"
+//							+ "xlabel('Time (ms)');\n"
+//							+ "ylabel('Theta (Deg)');\n"
+//							+ "title('PID Controller | " + filename + "');\n"
+//							+ "plot([0 " + timeout + "], [" + setPoint + " " + setPoint + "], 'r--');\n");
+//			    }
+//			    catch (IOException e) {
+//			    		System.err.println("Failed to write file header");
+//			    }
+//
+//				// run the PID test
+//				for(double Kp = p_; Kp <= p__; Kp = Kp + p___) {
+//					for(double Ki = i_; Ki <= i__; Ki = Ki + i___) {
+//						for(double Kd = d_; Kd <= d__; Kd = Kd + d___) {
+//							String label = String.format("Kp%di%dd%d", (int) (Kp*prec), (int) (Ki*prec), (int) (Kd*prec));
+//							legend = legend + "'" + label + "', ";
+//							System.out.println(label);
+//							
+//							expData = PIDController.PID(setPoint, Kp, Ki, Kd, power, timeout);							
+//							System.out.println("Time: " + (expData.substring(expData.lastIndexOf(';', expData.length()-3) + 2, expData.lastIndexOf(',')-2)) + " ms\n");							
+//						    EstTime = EstTime - testTime;
+//							try {
+//					    			out.write(""
+//					    					+ label + " = ["
+//					    					+ expData
+//					    					+ "];\n"
+//										+ "plot(" + label + "(:,1)," + label + "(:,2))\n"
+//										+ "% y = max(" + label + "(:,2));\n"
+//										+ "% x = " + label + "(find(" + label + "(:,2) == max(y), 1, 'first'));\n"
+//										+ "% text(x, y, '" + label + "');\n"
+//										+ "% pause;\n\n");
+//						    }
+//						    catch (IOException e) {
+//						    		System.err.println("Failed to write exp data");
+//						    }
+//							Delay.msDelay(100);
+//						}
+//					}
+//				}
+//				try {
+//					out.write(""
+//							+ "caseList = {" + legend.substring(0, legend.length() - 2) + "};\n"
+//							+ "legend('" + Integer.toString(setPoint) + " Deg', caseList{1,:});\n\n"
+//							+ "t = {" + legend.substring(0, legend.length() - 2).replace("'", "") + "};\n\n"
+//							+ "figure(2);\n"
+//							+ "hold on;\n"
+//							+ "xlabel('Time (ms)');\n"
+//							+ "ylabel('Theta (Deg)');\n"
+//							+ "title('PID Controller | " + filename + " | Good Options');\n"
+//							+ "plot([0 " + timeout + "], [" + setPoint + " " + setPoint + "], 'r--');\n"
+//							
+//							+ "upper = " + setPoint + ";\n"
+//							+ "idx = 0;\n"
+//							+ "while idx < 6\n"
+//							+ "    for e = t\n"
+//							+ "        if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= " + (setPoint) + "\n"
+//							+ "            idx = idx + 1;\n"
+//							+ "        end\n"
+//							+ "    end\n"
+//							+ "    upper = upper + 1;\n"
+//							+ "end\n"
+//							+ "upper = upper - 1;\n"
+//							+ "legendTwo = {'" + setPoint + " Deg'};\n"
+//							+ "idx = 0;\n"
+//							+ "for e = t\n"
+//							+ "    idx = idx + 1;\n"
+//							+ "    if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= " + (setPoint) + "\n"
+//							+ "        plot(e{1}(:,1),e{1}(:,2));\n"
+//							+ "        legendTwo{end+1} = caseList{idx};\n"
+//							+ "    end\n"
+//							+ "end\n"
+//							+ "newLegend = legend();\n"
+//							+ "newLegend = newLegend.String;\n"
+//							+ "idx = size(legendTwo);\n"
+//							+ "newLegend(end-idx(2)+1:end) = legendTwo(1:end);\n"
+//							+ "legend(newLegend);");
+//					out.close(); // flush the buffer and write the file
+//				}
+//				catch (IOException e) {
+//					System.err.println("Failed to close file");
+//				}
+//				System.out.println("Closed: " + filename);
+//				System.out.printf("ETA: %.2f min\n\n", (double)((EstTime / 1000) / 60));
+//				legend = "";
+//			}
+//		}
 		
 		
 //		// (Un)comment this section to run interpolated functions for K gains
