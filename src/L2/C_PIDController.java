@@ -6,7 +6,7 @@ package L2;
 import lejos.hardware.motor.UnregulatedMotor;
 import lejos.utility.Stopwatch;
 
-public class PIDController {
+public class C_PIDController {
 	UnregulatedMotor M;		// the motor
 	Stopwatch timer;			// the timer
 	String data;				// the pv and time data
@@ -21,7 +21,7 @@ public class PIDController {
 	int prevPower;			// power from previous sample
 	int sampleRate = 10;		// enforced minimum sample rate, 
 	
-	public PIDController(UnregulatedMotor motor) {
+	public C_PIDController(UnregulatedMotor motor) {
 		M = motor;
 		timer = new Stopwatch();
 	}
