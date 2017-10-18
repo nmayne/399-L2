@@ -5,23 +5,21 @@
 %       reflect the setpoints and powers you use in your experiment
 
 %       From C_Main.java
-%       precision = 10;
 % 		int setPoints[] = {50, 200, 400};	// test these angles (Deg)
 % 		int powers[] = {25, 50, 100};		// test these motor powers, [25, 100]
 
 X = [25 50 100];    % List of motor powers used in C_PID.java
-precision = 10;     % Precision from C_PID.java
+Precision = 10;     % Precision from C_PID.java
 
 
 % Add one list for each motor power to each Kx gain parameter
-% Kx{i}{j}: i = idx of powers, j = idx of setPoints
 Kp = {};
 Ki = {};
 Kd = {};
-for i = 1:size(X')
-    Kp{end+1} = [];
-    Ki{end+1} = [];
-    Kd{end+1} = [];
+for n = 1:size(X')
+    Kp{end+1} = [n];
+    Ki{end+1} = [n];
+    Kd{end+1} = [n];
 end
 
 % x(1) matches Kx{1}
