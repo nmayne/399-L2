@@ -120,35 +120,3 @@ caseList = {'Kp10i0d0', 'Kp20i0d0', 'Kp30i0d0', 'Kp40i0d0', 'Kp50i0d0', 'Kp60i0d
 legend('400 Deg', caseList{1,:});
 
 t = {Kp10i0d0, Kp20i0d0, Kp30i0d0, Kp40i0d0, Kp50i0d0, Kp60i0d0, Kp70i0d0, Kp80i0d0, Kp90i0d0, Kp100i0d0, Kp110i0d0, Kp120i0d0, Kp130i0d0, Kp140i0d0, Kp150i0d0, Kp160i0d0};
-
-figure(2);
-hold on;
-xlabel('Time (ms)');
-ylabel('Theta (Deg)');
-title('PID Controller | P50SP400 | Good Options');
-plot([0 3000], [400 400], 'r--');
-upper = 400;
-idx = 0;
-while idx < 6
-    for e = t
-        if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= 400
-            idx = idx + 1;
-        end
-    end
-    upper = upper + 1;
-end
-upper = upper - 1;
-legendTwo = {'400 Deg'};
-idx = 0;
-for e = t
-    idx = idx + 1;
-    if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= 400
-        plot(e{1}(:,1),e{1}(:,2));
-        legendTwo{end+1} = caseList{idx};
-    end
-end
-newLegend = legend();
-newLegend = newLegend.String;
-idx = size(legendTwo);
-newLegend(end-idx(2)+1:end) = legendTwo(1:end);
-legend(newLegend);

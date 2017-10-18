@@ -890,35 +890,3 @@ caseList = {'Kp10i0d0', 'Kp10i0d5', 'Kp10i0d10', 'Kp10i0d15', 'Kp10i0d20', 'Kp10
 legend('50 Deg', caseList{1,:});
 
 t = {Kp10i0d0, Kp10i0d5, Kp10i0d10, Kp10i0d15, Kp10i0d20, Kp10i0d25, Kp10i0d30, Kp10i0d35, Kp10i0d40, Kp20i0d0, Kp20i0d5, Kp20i0d10, Kp20i0d15, Kp20i0d20, Kp20i0d25, Kp20i0d30, Kp20i0d35, Kp20i0d40, Kp30i0d0, Kp30i0d5, Kp30i0d10, Kp30i0d15, Kp30i0d20, Kp30i0d25, Kp30i0d30, Kp30i0d35, Kp30i0d40, Kp40i0d0, Kp40i0d5, Kp40i0d10, Kp40i0d15, Kp40i0d20, Kp40i0d25, Kp40i0d30, Kp40i0d35, Kp40i0d40, Kp50i0d0, Kp50i0d5, Kp50i0d10, Kp50i0d15, Kp50i0d20, Kp50i0d25, Kp50i0d30, Kp50i0d35, Kp50i0d40, Kp60i0d0, Kp60i0d5, Kp60i0d10, Kp60i0d15, Kp60i0d20, Kp60i0d25, Kp60i0d30, Kp60i0d35, Kp60i0d40, Kp70i0d0, Kp70i0d5, Kp70i0d10, Kp70i0d15, Kp70i0d20, Kp70i0d25, Kp70i0d30, Kp70i0d35, Kp70i0d40, Kp80i0d0, Kp80i0d5, Kp80i0d10, Kp80i0d15, Kp80i0d20, Kp80i0d25, Kp80i0d30, Kp80i0d35, Kp80i0d40, Kp90i0d0, Kp90i0d5, Kp90i0d10, Kp90i0d15, Kp90i0d20, Kp90i0d25, Kp90i0d30, Kp90i0d35, Kp90i0d40, Kp100i0d0, Kp100i0d5, Kp100i0d10, Kp100i0d15, Kp100i0d20, Kp100i0d25, Kp100i0d30, Kp100i0d35, Kp100i0d40, Kp110i0d0, Kp110i0d5, Kp110i0d10, Kp110i0d15, Kp110i0d20, Kp110i0d25, Kp110i0d30, Kp110i0d35, Kp110i0d40, Kp120i0d0, Kp120i0d5, Kp120i0d10, Kp120i0d15, Kp120i0d20, Kp120i0d25, Kp120i0d30, Kp120i0d35, Kp120i0d40, Kp130i0d0, Kp130i0d5, Kp130i0d10, Kp130i0d15, Kp130i0d20, Kp130i0d25, Kp130i0d30, Kp130i0d35, Kp130i0d40, Kp140i0d0, Kp140i0d5, Kp140i0d10, Kp140i0d15, Kp140i0d20, Kp140i0d25, Kp140i0d30, Kp140i0d35, Kp140i0d40};
-
-figure(2);
-hold on;
-xlabel('Time (ms)');
-ylabel('Theta (Deg)');
-title('PID Controller | P100SP50 | Good Options');
-plot([0 1500], [50 50], 'r--');
-upper = 50;
-idx = 0;
-while idx < 6
-    for e = t
-        if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= 50
-            idx = idx + 1;
-        end
-    end
-    upper = upper + 1;
-end
-upper = upper - 1;
-legendTwo = {'50 Deg'};
-idx = 0;
-for e = t
-    idx = idx + 1;
-    if max(e{1}(:,2)) <= upper && max(e{1}(:,2)) >= 50
-        plot(e{1}(:,1),e{1}(:,2));
-        legendTwo{end+1} = caseList{idx};
-    end
-end
-newLegend = legend();
-newLegend = newLegend.String;
-idx = size(legendTwo);
-newLegend(end-idx(2)+1:end) = legendTwo(1:end);
-legend(newLegend);
