@@ -10,13 +10,13 @@ import lejos.utility.Delay;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import L2.PIDController;
+import L2.C_PIDController;
 
-public class Main {
+public class C_Main {
 
 	public static void main(String[] args) {
 		UnregulatedMotor M1 = new UnregulatedMotor(MotorPort.A);
-		PIDController PIDController1 = new PIDController(M1);
+		C_PIDController PIDController = new C_PIDController(M1);
 		
 //		// (Un)comment this section to run iterative testing w/ Matlab output
 //		
@@ -31,9 +31,9 @@ public class Main {
 //		// start values		// end values		// increment
 //		
 //		// P Controller
-//		double p_ = 1.0;		double p__ = 16.0;	double p___ = 1.0;		// Kp > 14 is unstable
-//		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
-//		double d_ = 0.0;		double d__ = 0.0;	double d___ = 0.5;		// Kd > 4 is unstable
+////		double p_ = 1.0;		double p__ = 16.0;	double p___ = 1.0;		// Kp > 14 is unstable
+////		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
+////		double d_ = 0.0;		double d__ = 0.0;	double d___ = 0.5;		// Kd > 4 is unstable
 //		
 //		// PD Controller
 ////		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
@@ -41,14 +41,14 @@ public class Main {
 ////		double d_ = 0.0;		double d__ = 4.0;	double d___ = 0.5;		// Kd > 4 is unstable
 //		
 //		// PID Controller
-////		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
-////		double i_ = 0.0;		double i__ = 0.6;	double i___ = 0.1;		// Ki > 0.6 is unstable
-////		double d_ = 0.0;		double d__ = 4.0;	double d___ = 0.5;		// Kd > 4 is unstable
+//		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
+//		double i_ = 0.0;		double i__ = 0.6;	double i___ = 0.1;		// Ki > 0.6 is unstable
+//		double d_ = 0.0;		double d__ = 4.0;	double d___ = 0.5;		// Kd > 4 is unstable
 //		
 //		
 //		
-//		int setPoints[] = {50, 200, 400};	// test these angles (Deg)
-//		int powers[] = {25, 50, 100};		// test these motor powers, [25, 100]
+//		int setPoints[] = {50, 200, 400};	// test these angles (Deg) {50, 200, 400}
+//		int powers[] = {25, 50, 100};		// test these motor powers {25, 50, 100}
 //		
 //		// approximately how long is this test series going to take?
 //		double PIDLoopCount = (((p__-p_)/p___)+1) * (((i__-i_)/i___)+1) * (((d__-d_)/d___)+1);
@@ -96,7 +96,7 @@ public class Main {
 //							legend = legend + "'" + label + "', ";
 //							System.out.println(label);
 //							
-//							expData = PIDController1.PID(setPoint, Kp, Ki, Kd, power, timeout);							
+//							expData = PIDController.PID(setPoint, Kp, Ki, Kd, power, timeout);							
 //							System.out.println("Time: " + (expData.substring(expData.lastIndexOf(';', expData.length()-3) + 2, expData.lastIndexOf(',')-2)) + " ms\n");							
 //						    EstTime = EstTime - testTime;
 //							try {
@@ -183,7 +183,7 @@ public class Main {
 //				double Ki = i_a * Math.exp(-Math.pow(((power - i_b) / i_c), 2));
 //				double Kd = d_a + (d_b * power) + (d_c * Math.pow(power, 2)) + (d_d * Math.pow(power, 3));
 //				
-//				PIDController1.PID(setPoint, Kp, Ki, Kd, power, timeout);	
+//				PIDController.PID(setPoint, Kp, Ki, Kd, power, timeout);	
 //				
 //				System.out.printf("P: %.5f\nI: %.5f\nD: %.5f\n",Kp, Ki, Kd);
 //				Delay.msDelay(2000);
@@ -222,13 +222,12 @@ public class Main {
 //				double Ki = i_a * Math.pow(power, i_b);
 //				double Kd = d_a * Math.pow(power, d_b);
 //				
-//				PIDController1.PID(setPoint, Kp, Ki, Kd, power, timeout);	
+//				PIDController.PID(setPoint, Kp, Ki, Kd, power, timeout);	
 //				
 //				System.out.printf("P: %.5f\nI: %.5f\nD: %.5f\n",Kp, Ki, Kd);
 //				Delay.msDelay(2000);
 //			}
 //		}
-		
 		
 		
 		
