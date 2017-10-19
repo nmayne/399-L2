@@ -10,12 +10,12 @@ public class C_PIDController {
 	UnregulatedMotor M;		// the motor
 	Stopwatch timer;			// the timer
 	String data;				// the pv and time data
-	double error ;			// error
 	double prevError;		// error from previous sample
 	double derivative;		// the derivative error
 	double integral;			// the integral error
 	double delta_t;			// delta t
 	double elapsed_t;		// elapsed t
+	int error;				// error
 	int pv;					// process variable: tachometer reading
 	int power;				// power to motor
 	int prevPower;			// power from previous sample
@@ -58,11 +58,12 @@ public class C_PIDController {
 			
 			data = data + elapsed_t + ", " + pv + "; ";	// update data log
 			
-			if(elapsed_t > timeout){break;}
+			if(elapsed_t > timeout){System.out.print("TIMEOUT\n"); break;}
 		}
 		M.setPower(0);// halt motor
-//		System.out.println("E: " + error + "\n\n");
-		return data;
+		System.out.print("E: " + error + "\n\n");
+		return Integer.toString(error);
+//		return data;
 	}
 	
 	// get the sign of a double

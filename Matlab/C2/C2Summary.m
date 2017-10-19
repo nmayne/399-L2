@@ -19,9 +19,9 @@ Xmp =  [25 50 100];
 Xsp = [50 200 400];
 
 % Data Filtering
-upperBound = 5;         % Maximum number of degrees above setpoint to search for good options
-settlingTime = 800;    % Maximum permissable settling time for minimum setpoint
-timeIncrement = 800;    % Increment the time for each set point
+upperBound = 50;         % Maximum number of degrees above setpoint to search for good options
+settlingTime = 400;      % Maximum permissable settling time for minimum setpoint
+timeIncrement = 1000;    % Increment the time for each set point
 minResults = 3;         % Return a least this many good option cases
 %% Fetch desired data from .m files
 %   Power = 25
@@ -88,7 +88,7 @@ close 2;
 for Mp  = 1:3
     for Kx = 1:3
         for Sp = 1:3
-            A(Mp, Kx, Sp) = mode(K{Mp,Kx}{Sp});
+            A(Mp, Kx, Sp) = mean(K{Mp,Kx}{Sp});
         end                                
     end
 end

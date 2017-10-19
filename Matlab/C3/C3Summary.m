@@ -19,18 +19,19 @@ Xmp =  [25 50 100];
 Xsp = [50 200 400];
 
 % Data Filtering
-upperBound = 5;         % Maximum number of degrees above setpoint to search for good options
-settlingTime = 800;    % Maximum permissable settling time for minimum setpoint
-timeIncrement = 1000;    % Increment the time for each set point
-minResults = 6;         % Return a least this many good option cases
+upperBound = 10;         % Maximum number of degrees above setpoint to search for good options
+settlingTime50 = 500;    % Maximum permissable settling time for minimum setpoint
+settlingTime200 = 1300;
+settlingTime400 = 2500;
+minResults = 13;         % Return a least this many good option cases
 %% Fetch desired data from .m files
 %   Power = 25
 P25SP50
-filterData(t, caseList, 25, 50, upperBound, settlingTime, minResults)
+filterData(t, caseList, 25, 50, upperBound, settlingTime50, minResults)
 P25SP200
-filterData(t, caseList, 25, 200, upperBound, settlingTime+(timeIncrement), minResults)
+filterData(t, caseList, 25, 200, upperBound, settlingTime200, minResults)
 P25SP400
-filterData(t, caseList, 25, 400, upperBound, settlingTime+(timeIncrement*2), minResults)
+filterData(t, caseList, 25, 400, upperBound, settlingTime400, minResults)
 
 lgd = legend();
 P25 = lgd.String;
@@ -41,11 +42,11 @@ close 2;
 
 %   Power = 50
 P50SP50
-filterData(t, caseList, 50, 50, upperBound, settlingTime, minResults)
+filterData(t, caseList, 50, 50, upperBound, settlingTime50, minResults)
 P50SP200
-filterData(t, caseList, 50, 200, upperBound, settlingTime+(timeIncrement), minResults)
+filterData(t, caseList, 50, 200, upperBound, settlingTime200, minResults)
 P50SP400
-filterData(t, caseList, 50, 400, upperBound, settlingTime+(timeIncrement*2), minResults)
+filterData(t, caseList, 50, 400, upperBound, settlingTime400, minResults)
 
 lgd = legend();
 P50 = lgd.String;
@@ -56,11 +57,11 @@ close 2;
 
 %   Power = 100
 P100SP50
-filterData(t, caseList, 100, 50, upperBound, settlingTime, minResults)
+filterData(t, caseList, 100, 50, upperBound, settlingTime50, minResults)
 P100SP200
-filterData(t, caseList, 100, 200, upperBound, settlingTime+(timeIncrement), minResults)
+filterData(t, caseList, 100, 200, upperBound, settlingTime200, minResults)
 P100SP400
-filterData(t, caseList, 100, 400, upperBound, settlingTime+(timeIncrement*2), minResults)
+filterData(t, caseList, 100, 400, upperBound, settlingTime400, minResults)
 
 lgd = legend();
 P100 = lgd.String;
@@ -88,7 +89,7 @@ close 2;
 for Mp  = 1:3
     for Kx = 1:3
         for Sp = 1:3
-            A{Mp, Kx, Sp} = mean(K{Mp,Kx}{Sp}); % DO MEAN OR MODE
+            A(Mp, Kx, Sp) = mean(K{Mp,Kx}{Sp}); % DO MEAN OR MODE
         end                                
     end
 end
