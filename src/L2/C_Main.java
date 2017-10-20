@@ -20,7 +20,7 @@ public class C_Main {
 		UnregulatedMotor M1 = new UnregulatedMotor(MotorPort.A);
 		C_PIDController PIDController = new C_PIDController(M1);
 		Stopwatch timer = new Stopwatch();
-		BotServer network = new BotServer(3000);
+//		BotServer network = new BotServer(3000);
 		
 //		// (Un)comment this section to run iterative testing w/ Matlab output
 //		
@@ -140,7 +140,7 @@ public class C_Main {
 		
 		
 /**
- * PART C1 - TIME = 1.6 min, ERROR = 3
+ * PART C1 - TIME = 1.43 min, ERROR = 0
  * Selected fitted model Mean Kp(mp) from Matlab/C1/ because of monotonicty, and near-linearity that matches context expectations
  * Performs reasonable well at low powers, struggles as battery gets lower, compensation for undershooting leads to overshoot.
  * 
@@ -151,6 +151,7 @@ public class C_Main {
  * 		p2 =    -0.08867
  * 		p3 =       8.622    // Corrected by an additional +5.0
  * 							// Tried correcting for debilitating steady state error from overshoot and undershoot, but could not.
+ * 							// This is really dependent upon battery power, as the battery power drops the gains needs compensation!
  */
 //		// (Un)comment this section to run model for P Controller
 //		int timeout = 20000;
@@ -178,7 +179,7 @@ public class C_Main {
 //		Button.waitForAnyPress();
 		
 /**
- * PART C2 TIME = 1.62 min, ERROR = 1
+ * PART C2 TIME = 1.46 min, ERROR = 0
  * Selected fitted model Mean Kp(mp), Mean Kd(mp) from Matlab/C2/ because of monotonicty, and pleasing inverse relationship matching context expectations
  * Had to resample data because power was too low and derivative too high for low powers. Really struggles at low powers when battery power is low
  * Linear model Poly2 for Kp:
@@ -223,7 +224,7 @@ public class C_Main {
 //		Button.waitForAnyPress();
 		
 /**
- * PART C3 TIME = 1.85 min, ERROR = 4
+ * PART C3 TIME = 1.45 min, ERROR = 0
  * Selected fitted model Mean Kp(mp), Mode Ki(sp) and Mode Kd(mp) from Matlab/C3/ 
  * Difficult to tune! Tried Kx(sp) and this worked okay inside the range of the sp test data but failed outside it.
  * Re-fitted to new models, works well for low powers and small set point and for larger powers and larger set points, struggles a bit in between.
