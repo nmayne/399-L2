@@ -20,6 +20,7 @@ public class C_Main {
 		UnregulatedMotor M1 = new UnregulatedMotor(MotorPort.A);
 		C_PIDController PIDController = new C_PIDController(M1);
 		Stopwatch timer = new Stopwatch();
+		BotServer network = new BotServer(3000);
 		
 //		// (Un)comment this section to run iterative testing w/ Matlab output
 //		
