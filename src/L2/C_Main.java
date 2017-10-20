@@ -34,9 +34,9 @@ public class C_Main {
 //		// start values		// end values		// increment
 //		
 //		// P Controller
-////		double p_ = 1.0;		double p__ = 16.0;	double p___ = 1.0;		// Kp > 14 is unstable
-////		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
-////		double d_ = 0.0;		double d__ = 0.0;	double d___ = 0.5;		// Kd > 4 is unstable
+//		double p_ = 1.0;		double p__ = 16.0;	double p___ = 1.0;		// Kp > 14 is unstable
+//		double i_ = 0.0;		double i__ = 0.0;	double i___ = 0.1;		// Ki > 0.6 is unstable
+//		double d_ = 0.0;		double d__ = 0.0;	double d___ = 0.5;		// Kd > 4 is unstable
 //		
 //		// PD Controller
 ////		double p_ = 1.0;		double p__ = 14.0;	double p___ = 1.0;		// Kp > 14 is unstable
@@ -136,7 +136,7 @@ public class C_Main {
 //				legend = "";
 //			}
 //		}
-		
+//		
 		
 /**
  * PART C1 - TIME = 1.43 min, ERROR = 0
