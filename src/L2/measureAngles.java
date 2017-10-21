@@ -12,7 +12,7 @@ public class measureAngles {
 		new UnregulatedMotor(MotorPort.A)	// right motor motors[1]
 	};
 	static int[][] TC = new int[3][2];
-	static int[] offset = {41,72};
+	static int[] offset = {61,69};
 	static int count = 0;
 	static int command;
 	static double rad;
@@ -71,7 +71,7 @@ public class measureAngles {
 						for(int i=0; i<2; i++){
 							motors[i].resetTachoCount();
 						}
-						point[0][0] = -74; 	// Ax --intersection point
+						point[0][0] = -72; 	// Ax --intersection point
 						point[0][1] = 0;	// Ay --intersection point
 					}
 					else {
@@ -109,11 +109,29 @@ public class measureAngles {
 				coord[j][0] = (rotMat[0][0]*point[k-1][0]) + (rotMat[0][1]*point[k-1][1]); // x coordinate for joint j
 				coord[j][1] = (rotMat[1][0]*point[k-1][0]) + (rotMat[1][1]*point[k-1][1]); // y coordinate for joint j
 			}
-			point[k][0] = coord[0][0] + coord[1][0] - point[k-1][0]; // new x coordinate at end effector
-			point[k][1] = coord[0][1] + coord[1][1] - point[k-1][1]; // new y coordinate at end effector
+			double J1x = (2.067 * coord[0][0]) + 0.3235;
+			double J1y = (1.717 * coord[0][1]) + 0.9889;
+		    	System.out.printf("J1x: %.2f J1y: %.2f", J1x, J1y);
+		    	if (TC[k-1][1] == 0) {
+		    		point[k][0] = J1x;
+		    		point[k][1] = J1y;
+		    	}
+		    	else if (TC[k-1][0] == 0){
+		    		point[k][0] = -72 + coord[1][0];
+		    		point[k][1] = coord[1][1];
+		    	}
+		    	else {
+		    		point[k][0] = J1x - coord[1][0] - 72;
+		    		point[k][1] = J1y; // 10 keeps down error
+		    	}
+//			point[k][0] = coord[0][0] + coord[1][0] - point[k-1][0]; // new x coordinate at end effector
+//			point[k][1] = coord[0][1] + coord[1][1] - point[k-1][1]; // new y coordinate at end effector
 			System.out.printf("point: %d \nCoord x: %.2f\n", k, point[k][0]);
 			System.out.printf("Coord y: %.2f\n", point[k][1]);
 		}
+
+
+//	    	System.out.printf("\nEEx : %.0f EEy : %.0f" , EEx, EEy);
 		// use law of cosines --> cos(A) = (b^2 + c^2 - a^2) / 2bc to calculate angle at intersection 
 		// calculate a, b, c
 		a = Math.sqrt(Math.pow(point[2][0] - point[1][0], 2) + Math.pow(point[2][1] - point[1][1], 2));
