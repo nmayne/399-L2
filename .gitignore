@@ -1,1 +1,6 @@
 /bin/
+/TouchBot/
+/.DS_Store
+/.classpath
+/.project
+/.settings/
