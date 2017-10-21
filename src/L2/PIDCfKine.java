@@ -12,7 +12,7 @@ public class PIDCfKine {
 	UnregulatedMotor M;						// the motor
 	Stopwatch timer;							// the timer
 	double[][] rotMat = new double[2][2];	// store rotation matrix values
-	double[] coord = {-74,0};				// starting coordinate [x, y] in millimeters
+	double[] coord = {-72,0};				// starting coordinate [x, y] in millimeters
 	double[] newCoord = {0,0};				// end effector position
 	double error ;							// error
 	double prevError;						// error from previous sample
@@ -26,7 +26,6 @@ public class PIDCfKine {
 	int tacho;								// tachometer reading
 	int power;								// power to motor
 	int prevPower;							// power from previous sample
-	int powerMin = 3;						// minimum power to get PID controller to finish when Kp = 1
 	int sampleRate = 10;						// enforced minimum sample rate, 
 	int timeout = 100000;					// timeout after x ms
 	
@@ -56,42 +55,42 @@ public class PIDCfKine {
 
 		M.resetTachoCount();
 		timer.reset();
-
-		while (error != 0 || prevError != 0){
-			// PID
+//		System.out.println("PID" + target);
+		while (error != 0 || prevError != 0){		
 			integral = integral + (error * delta_t/100);
 			derivative = (error - prevError) / (delta_t/100);
 			power = (int) Math.abs((Kp * error) + (Ki * integral) + (Kd * derivative));
-			M.setPower(isPos(error) * (Math.min(powerMax, powerMin + power)));
+			M.setPower(isPos(error) * (Math.min(powerMax, power)));
 
-			while(timer.elapsed()<sampleRate){}
-				delta_t = timer.elapsed();
-				elapsed_t = elapsed_t + delta_t;
-				timer.reset();
-				prevError = error;
-				tacho = M.getTachoCount();
-				error = target - tacho;
-				if(Matlab) {System.out.print(elapsed_t + ", " + tacho + "; ");}	// Output for Matlab
-				if(elapsed_t > timeout){break;}
-			}
+			while(timer.elapsed()<sampleRate ){}		// enforce minimum sample rate
+            // get delta t and error
+			delta_t = timer.elapsed();
+			elapsed_t = elapsed_t + delta_t;
+			timer.reset();
+			prevError = error;
+			tacho = M.getTachoCount();
+			error = target - tacho;
+            if(elapsed_t > timeout){System.out.print("TIMEOUT\n"); break;}
+		}
+		M.setPower(0); 						// halt motor
 		
-			M.setPower(0); 						// halt motor
-			// get end effector position
-			double tacho = M.getTachoCount();
-			rad = ((Math.PI*tacho)/(180*offset))%(2*Math.PI);
+		// get end effector position
+		double tacho = M.getTachoCount();
+		// System.out.printf("TC: %.2f\n", tacho);
+		rad = ((Math.PI*tacho)/(180*offset))%(2*Math.PI);
 //			System.out.printf("\nradians: %.3f", rad);
-			// calculate rotation matrix from true angle position change
-			rotMat[0][0] = Math.cos(rad);
-			rotMat[1][1] = rotMat[0][0];
-			if (rad > 0) { 	// clockwise 
-				rotMat[0][1] = Math.sin(rad);
-				rotMat[1][0] = Math.sin(rad) * (-1);
-			}
-			else { 			// counterclockwise
-				rotMat[0][1] = Math.sin(Math.abs(rad)) * (-1);
-				rotMat[1][0] = Math.sin(Math.abs(rad));				
-			}
-			// print rotation matrix for error testing
+		// calculate rotation matrix from true angle position change
+		rotMat[0][0] = Math.cos(rad);
+		rotMat[1][1] = rotMat[0][0];
+		if (rad > 0) { 	// clockwise 
+			rotMat[0][1] = Math.sin(rad);
+			rotMat[1][0] = Math.sin(rad) * (-1);
+		}
+		else { 			// counterclockwise
+			rotMat[0][1] = Math.sin(Math.abs(rad)) * (-1);
+			rotMat[1][0] = Math.sin(Math.abs(rad));				
+		}
+		// print rotation matrix for error testing
 //			for (int i = 0; i < 2; i++) {
 //				System.out.println("\n");
 //				for (int j = 0; j < 2; j++) {
@@ -100,12 +99,12 @@ public class PIDCfKine {
 //			}
 
 //			// calculate new [x y] position
-			newCoord[0] = (rotMat[0][0]*coord[0]) + (rotMat[0][1]*coord[1]);
-			newCoord[1] = (rotMat[1][0]*coord[0]) + (rotMat[1][1]*coord[1]);
-//			System.out.printf("\nCoord x: %.3f", newCoord[0]);
-//			System.out.printf("\nCoord y: %.3f", newCoord[1]);
-			return newCoord;
-		}
+		newCoord[0] = (rotMat[0][0]*coord[0]) + (rotMat[0][1]*coord[1]);
+		newCoord[1] = (rotMat[1][0]*coord[0]) + (rotMat[1][1]*coord[1]);
+		System.out.printf("\nCoord x: %.3f", newCoord[0]);
+		System.out.printf("\nCoord y: %.3f", newCoord[1]);
+		return newCoord;
+	}
 	
 	// get the sign of a double
 	int isPos(double e) {
