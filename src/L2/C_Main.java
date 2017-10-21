@@ -15,7 +15,6 @@ import java.io.IOException;
 import L2.C_PIDController;
 
 public class C_Main {
-//ALL THESE CHANGES
 	public static void main(String[] args) {
 		UnregulatedMotor M1 = new UnregulatedMotor(MotorPort.A);
 		C_PIDController PIDController = new C_PIDController(M1);
