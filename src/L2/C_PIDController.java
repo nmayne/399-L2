@@ -62,8 +62,8 @@ public class C_PIDController {
 		}
 		M.setPower(0);// halt motor
 		System.out.print("E: " + error + "\n\n");
-		return Integer.toString(error);
-//		return data;
+//		return Integer.toString(error);
+		return data;
 	}
 	
 	// get the sign of a double
