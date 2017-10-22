@@ -1,13 +1,13 @@
 package L2;
 
-import L2.fKinematics_b;
+import L2.iKinematics_b;
 
-public class fKinematics_a {
+public class iKinematics_a {
 
 	public static void main(String[] args) {
 		// method stub
 		try {
-			fKinematics_b.fkine(45, 45); // x = [0, 60] y = [-60, 170]
+			iKinematics_b.ikine(102,102); // (102, 102) ~ (-45 deg, -45 deg)
 		} catch (Exception e) {
 			// catch block
 			e.printStackTrace();
