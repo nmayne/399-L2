@@ -1,12 +1,13 @@
 package L2;
 
+import lejos.hardware.Button;
 import lejos.hardware.motor.UnregulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.utility.Delay;
 
 import L2.PID;
 	
-public class forwardK {
+public class fKinematics_b {
 	
 	static class Motor implements Runnable {
 		PID PID;
@@ -34,7 +35,7 @@ public class forwardK {
 
 	public static void fkine(int A, int B) {
 		int[] offset = {62, 69};
-		double[] target = {A, B};
+		double[] target = {(-1) * A, (-1) *B}; // account for different motor rotation
 		double[] L = {72, 72};
 //		double[] power = {100, 100};
 //        double[] Kp = {0.0004637, -0.08011, 5.18};
@@ -64,11 +65,12 @@ public class forwardK {
  		motor2.start();
  
 		double x = (L[0] * Math.cos(Math.toRadians(target[0]))) + (L[1] * Math.cos(Math.toRadians(target[1])));
-		double y = (L[0] * Math.sin(Math.toRadians(target[0]))) + (L[1] * Math.sin(Math.toRadians(target[1])));
-		System.out.printf("(x, y) = (%.2f, %.2f)\n", x, y);
+		double y = (-1) * (L[0] * Math.sin(Math.toRadians(target[0]))) + (L[1] * Math.sin(Math.toRadians(target[1])));
+		System.out.printf("(x, y) = (%.0f, %.0f)\n", x, y);
 		
 		Delay.msDelay(2000);	
-		
+		Button.waitForAnyEvent();
+
 	}
 }
 
