@@ -4,8 +4,7 @@ import lejos.hardware.Button;
 import lejos.hardware.motor.UnregulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.utility.Delay;
-import lejos.utility.Stopwatch;
-import L2.invKine;
+import L2.iKinematics_b;
 
 public class midPoint {
 	
@@ -13,125 +12,107 @@ public class midPoint {
 		new UnregulatedMotor(MotorPort.D),	// left motor motors[0]
 		new UnregulatedMotor(MotorPort.A)	// right motor motors[1]
 	};
-	static Stopwatch timer = new Stopwatch();				// the timer
-	static int x;
-	static int y;
+	static int[] offset = {61,69};
+	static int tachoCount;
 	static int count = 0;
 	static int command;
-	static int[] offset = {41,72};
-	static int[][] TC = new int[4][2];
-	static double rad;
-	static double[] M = new double[2];
-	static double[][] rotMat = new double[2][2];
-	static double[][] point = new double[3][2]; // [0][0] = Ax, [0][1] = Ay, [1][0] = Bx, [1][1] = By, [2][0] = Cx, [2][1] = Cy
-	static double[][] coord = new double[2][2];
+	static double a;
+	static double b;
+	static double c;
+	static double[] x = new double[3];
+	static double[] y = new double[3];
+	static double cosA;
+	static double distance;
+	static double[] mid = new double[2];
+	static double[] L = {72, 72};
+	static double[][] targetAng = new double[3][3];
 
-
-	public static void main(String[] args) throws Exception {
-		System.out.println("Press the enter \nbutton to begin.\n");   
-		// zero out tachocount just in case
+	public static void main(String[] args) {
+		System.out.println("Press a button\n");   
+		
 		for(int i=0; i<2; i++){
+			motors[i].setPower(100);
+			motors[i].stop();
 			motors[i].resetTachoCount();
 		}
-		// only grab 3 points (start, point 1, point 2)
-		// find midpoint between point 1 and point 2
+
 		while (count < 3) {
 			command = Button.readButtons();
 			switch(command) {
 				case 16:
 					// left button pressed
-            			motors[1].setPower(100);
+            			motors[1].forward();
             			Delay.msDelay(100);
-            			motors[1].setPower(0);
+            			motors[1].stop();
             			break;
 				case 1:
 					// up button pressed
-					motors[1].setPower(-100);
+					motors[1].backward();
 					Delay.msDelay(100);
-        				motors[1].setPower(0);			
+        				motors[1].stop();			
 					break;
 				case 4:
 					// right button pressed
-        				motors[0].setPower(100);
+        				motors[0].forward();
         				Delay.msDelay(100);	
-        				motors[0].setPower(0);
+        				motors[0].stop();
         				break;
 				case 8:
 					// down button pressed
-					motors[0].setPower(-100);
+					motors[0].backward();
 					Delay.msDelay(100);
-        				motors[0].setPower(0);			
+        				motors[0].stop();			
 					break;			
 				case 2:
 					// enter button pressed
-					Delay.msDelay(1000);	// keeps down error 
+					Delay.msDelay(500);	// keeps down error 
 					if (count == 0) {
-						System.out.println("Please select two points.\n");
-						Delay.msDelay(1000);	// keeps down error 
+						System.out.println("Origin marked.\n");
 						for(int i=0; i<2; i++){
 							motors[i].resetTachoCount();
 						}
-						point[0][0] = -74; 	// Ax --intersection point
-						point[0][1] = 0;	// Ay --intersection point
+						x[0] = 144.0;
+						y[0] = 0.0;
 					}
 					else {
-						System.out.printf("\nPoint %d marked.\n", count);
+						System.out.printf("Point %d marked.\n", count + 1);
 						for(int i=0; i<2; i++){
-							int boop = motors[i].getTachoCount();
-//							System.out.printf("\nTC: %d  i: %d", boop, i);
-							TC[count][i] = boop;
-							motors[i].resetTachoCount();
+							targetAng[count-1][i] = (-1) * motors[i].getTachoCount() / offset[i];
+							System.out.printf("targetAng %d: %.2f\n", i, targetAng[count-1][i]);
 						}
 					}
 					count++;
-					Delay.msDelay(1000);	// keeps down error 
+					Delay.msDelay(500);	// keeps down error 
+					break;
+				case 32:
+					// escape button pressed
 					break;
 				default:
 					break;		
 			} 
-		} 
-		// invKine opens new motors so need to close these
-		for(int i=0; i<2; i++){
-			motors[i].close();
 		}
-		// maths
-		for (int k = 1; k < 3; k++) {
-			for (int j = 0; j < 2; j++) { // j = motor 0 or 1
-				rad = ((Math.PI*TC[k-1][j])/(180*offset[j]))%(2*Math.PI);
-				rotMat[0][0] = Math.cos(rad);
-				rotMat[1][1] = rotMat[0][0];
-				if (rad > 0) { 	// clockwise 
-					rotMat[0][1] = Math.sin(rad);
-					rotMat[1][0] = Math.sin(rad) * (-1);
-				}
-				else { 			// counterclockwise
-					rotMat[0][1] = Math.sin(Math.abs(rad)) * (-1);
-					rotMat[1][0] = Math.sin(Math.abs(rad));		
-				}
-				coord[j][0] = (rotMat[0][0]*point[k-1][0]) + (rotMat[0][1]*point[k-1][1]); // x coordinate for joint j
-				coord[j][1] = (rotMat[1][0]*point[k-1][0]) + (rotMat[1][1]*point[k-1][1]); // y coordinate for joint j
-			}
-			point[k][0] = coord[0][0] + coord[1][0] - point[k-1][0]; // new x coordinate at end effector
-			point[k][1] = coord[0][1] + coord[1][1] - point[k-1][1]; // new y coordinate at end effector
-			System.out.printf("point: %d \nCoord x: %.2f\n", k, point[k][0]);
-			System.out.printf("Coord y: %.2f\n", point[k][1]);
+		// calculate distance between first point and second point
+		for (int j = 1; j < 3; j++) {
+			x[j] = (L[0] * Math.cos(Math.toRadians(targetAng[j-1][0]))) + (L[1] * Math.cos(Math.toRadians(targetAng[j-1][1])));
+			y[j] = (L[0] * Math.sin(Math.toRadians(targetAng[j-1][0]))) + (L[1] * Math.sin(Math.toRadians(targetAng[j-1][1])));
+			System.out.printf("\npoint %d: \n(x, y) = (%.2f, %.2f)\n", j, x[j], y[j]);
 		}
 		// find midpoint between 2nd and 3rd point
-		M[0] = (point[1][0] + point[2][0])/2;  	// x coordinate at midpoint
-		M[1] = (point[1][1] + point[2][1])/2;	// y coordinate at midpoint
-		System.out.printf("\nMidpoint\nx: %.2f y: %.2f\n", M[0],M[1]);		
-		// Move to x = M[0] - point[2][0] - 74; y = M[1] - point[2][1] - 0;
-		x = (int) (M[0] - point[2][0] - 74);
-		y = (int) (M[1] - point[2][1]);
-		System.out.printf("\ninvK\nx: %d y: %d\n", x,y);
+		mid[0] = (x[1] + x[2])/2;  	// x coordinate at midpoint
+		mid[1] = (y[1] + y[2])/2;	// y coordinate at midpoint
+		System.out.printf("\nMidpoint\nx: %.2f y: %.2f\n", mid[0], mid[1]);	
+		// iKinematics starts from home position, so find where midpoint is relative to [144, 0]
+		double X = x[0] - (x[2] - mid[0]);
+		double Y = y[0] - (y[2] - mid[1]);
 		// Call invKine from where arm is currently and move to (x, y) midpoint
 		try {
-			invKine.ikine(x, y);
+			iKinematics_b.ikine(X, Y);
 		} catch (Exception e) {
 			// catch block
 			e.printStackTrace();
 		}
-		
-		Delay.msDelay(1000);
+		for(int i=0; i<2; i++){
+			motors[i].close();
+		}
 	}
 }
